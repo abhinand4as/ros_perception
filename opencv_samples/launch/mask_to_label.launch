@@ -1,0 +1,9 @@
+<launch>
+
+  
+    <node name="mask_image_to_label"
+          pkg="jsk_perception" type="mask_image_to_label.py">
+      <remap from="~input" to="mask_image" />
+    </node>
+  
+</launch>
