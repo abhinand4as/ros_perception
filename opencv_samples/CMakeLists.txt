@@ -8,6 +8,9 @@ project(opencv_samples)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   rospy
+  roscpp
+  cv_bridge
+  image_transport
 )
 
 ## System dependencies are found with CMake's conventions
@@ -70,10 +73,10 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-include_directories(
-# include
-  ${catkin_INCLUDE_DIRS}
-)
+# include_directories(
+# # include
+#   ${catkin_INCLUDE_DIRS}
+# )
 
 include_directories(
 # include
@@ -85,6 +88,11 @@ include_directories(
 find_package(OpenCV)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+
+
+add_executable(image_pub_sub_cpp src/image_pub_sub.cpp)
+target_link_libraries(image_pub_sub_cpp ${catkin_LIBRARIES})
+target_link_libraries(image_pub_sub_cpp ${OpenCV_LIBRARIES})
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
 #   src/${PROJECT_NAME}/opencv_samples.cpp

@@ -5,12 +5,14 @@ import cv2
 import time
 import rospy
 from std_msgs.msg import String
+from std_msgs.msg import Int32
 from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import sys
 mask_image_pub = rospy.Publisher("mask_image",Image, queue_size=10)
+# rect_pts_pub = rospy.Publisher("rect_pts", Int32, queue_size=1)
 bridge = CvBridge()
-
+rect_pts = Int32()
 def read_rgb_image(image_name, show):
     rgb_image = cv2.imread(image_name)
     if show: 
@@ -53,6 +55,7 @@ def draw_ball_contour(binary_image, rgb_image, contours):
         ((x, y), radius) = cv2.minEnclosingCircle(c)
         contours_poly = cv2.approxPolyDP(c, 3, True)
         boundRect = cv2.boundingRect(contours_poly)
+        
         if (area>10000):
 
             color = (0, 255, 0)
@@ -64,6 +67,7 @@ def draw_ball_contour(binary_image, rgb_image, contours):
             (int(boundRect[0]+boundRect[2]), int(boundRect[1]+boundRect[3])), 255, -1)
 
             print ("Area: {}, Perimeter: {}".format(area, perimeter))
+            # rect_pts.data = [int(boundRect[0]), int(boundRect[1]), int(boundRect[0]+boundRect[2]), int(boundRect[1]+boundRect[3])]
     print ("number of contours: {}".format(len(contours)))
     cv2.imshow("RGB Image Contours",rgb_image)
     cv2.imshow("Black Image Contours",mask_image)
@@ -100,9 +104,10 @@ def image_callback(ros_image):
     mask_image = detect_ball_in_a_frame(cv_image)
     time.sleep(0.033)
     cv2.waitKey(3)
-
+    # rect_pts_ = rect_pts
     try:
       mask_image_pub.publish(bridge.cv2_to_imgmsg(mask_image, "mono8"))
+    #   rect_pts_pub.publish(rect_pts_)
     except CvBridgeError as e:
       print(e)
  
@@ -111,8 +116,10 @@ def image_callback(ros_image):
 def main():
     rospy.init_node('contour_detection', anonymous=True)
 
-    image_sub = rospy.Subscriber("/rgb/image_raw",Image, image_callback)
+    # image_sub = rospy.Subscriber("/rgb/image_raw",Image, image_callback)
+    image_sub = rospy.Subscriber("/usb_cam/image_raw",Image, image_callback)
     # mask_image_pub = rospy.Publisher("mask_image",Image)
+    print("hii")
     try:
         rospy.spin()
     except KeyboardInterrupt:
